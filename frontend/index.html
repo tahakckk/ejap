@@ -153,7 +153,9 @@
       <!-- Filters -->
       <section class="filters-section" id="filters-section" aria-label="Filters">
         <div class="filter-group">
-          <span class="filter-icon">🔍</span>
+          <span class="filter-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
           <input type="text" id="filter-company" placeholder="Search by company name..." class="filter-input"
             autocomplete="off" />
         </div>
@@ -172,7 +174,9 @@
           <p>Loading applications…</p>
         </div>
         <div id="empty-state" class="empty-state hidden" aria-live="polite">
-          <div class="empty-icon">📭</div>
+          <div class="empty-icon" style="margin-bottom: 16px; color: var(--text-3);">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2"></path><path d="M21 14v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6"></path><path d="M10 12h4"></path></svg>
+          </div>
           <h2>No applications found</h2>
           <p>Click <strong>New Application</strong> to start tracking your job search.</p>
         </div>
