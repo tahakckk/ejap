@@ -47,8 +47,8 @@ app.use((err, req, res, next) => {
 initializeDatabase()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`✅ Job Tracker API running at http://localhost:${PORT}`);
-      console.log(`📖 Swagger docs at http://localhost:${PORT}/api-docs`);
+      console.log(`[EJAP System] Enterprise Job Tracker API operational at http://localhost:${PORT}`);
+      console.log(`[EJAP System] OpenAPI documentation available at http://localhost:${PORT}/api-docs`);
     });
   })
   .catch(err => {
