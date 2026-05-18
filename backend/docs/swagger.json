@@ -1,0 +1,237 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Job Application Tracker API",
+    "version": "1.0.0",
+    "description": "RESTful API for managing job applications. Built with Express.js and SQLite."
+  },
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Local development server" }
+  ],
+  "security": [
+    { "BearerAuth": [] }
+  ],
+  "tags": [
+    { "name": "Authentication", "description": "User registration and login" },
+    { "name": "Applications", "description": "Job application CRUD operations" },
+    { "name": "Statuses",     "description": "Application status categories" }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthInput" } } }
+        },
+        "responses": {
+          "201": { "description": "User registered" },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login and get a JWT token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthInput" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthResponse" } } }
+          },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/api/applications": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "List all applications",
+        "description": "Returns all job applications. Supports optional filtering by company name and status.",
+        "parameters": [
+          {
+            "in": "query", "name": "company_name", "schema": { "type": "string" },
+            "description": "Filter by company name (partial match)"
+          },
+          {
+            "in": "query", "name": "status_id", "schema": { "type": "integer" },
+            "description": "Filter by status ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of applications",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Application" } }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Applications"],
+        "summary": "Create a new application",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApplicationInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created application",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/Application" } }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/applications/{id}": {
+      "parameters": [
+        { "in": "path", "name": "id", "required": true, "schema": { "type": "integer" }, "description": "Application ID" }
+      ],
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Get a single application",
+        "responses": {
+          "200": {
+            "description": "Application detail",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Application" } } }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "put": {
+        "tags": ["Applications"],
+        "summary": "Update an application",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApplicationInput" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated application",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Application" } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Applications"],
+        "summary": "Delete an application",
+        "responses": {
+          "200": { "description": "Deletion confirmation", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MessageResponse" } } } },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/statuses": {
+      "get": {
+        "tags": ["Statuses"],
+        "summary": "List all statuses",
+        "description": "Returns all available application status categories used in filters and forms.",
+        "responses": {
+          "200": {
+            "description": "Array of statuses",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Status" } }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "AuthInput": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string", "format": "password" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "user": {
+            "type": "object",
+            "properties": { "id": { "type": "integer" }, "username": { "type": "string" } }
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "id":   { "type": "integer", "example": 1 },
+          "name": { "type": "string",  "example": "Pending" }
+        }
+      },
+      "Application": {
+        "type": "object",
+        "properties": {
+          "id":               { "type": "integer", "example": 1 },
+          "company_name":     { "type": "string",  "example": "Google" },
+          "position":         { "type": "string",  "example": "Software Engineer" },
+          "status_id":        { "type": "integer", "example": 1 },
+          "status_name":      { "type": "string",  "example": "Pending" },
+          "application_date": { "type": "string",  "format": "date", "example": "2026-05-01" },
+          "notes":            { "type": "string",  "nullable": true, "example": "Applied via LinkedIn" }
+        }
+      },
+      "ApplicationInput": {
+        "type": "object",
+        "required": ["company_name", "position", "status_id", "application_date"],
+        "properties": {
+          "company_name":     { "type": "string",  "example": "Google" },
+          "position":         { "type": "string",  "example": "Software Engineer" },
+          "status_id":        { "type": "integer", "example": 1 },
+          "application_date": { "type": "string",  "format": "date", "example": "2026-05-01" },
+          "notes":            { "type": "string",  "nullable": true }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": { "error": { "type": "string" } }
+      }
+    },
+    "responses": {
+      "BadRequest":    { "description": "Validation error",       "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+      "NotFound":      { "description": "Resource not found",     "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+      "InternalError": { "description": "Internal server error",  "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+    }
+  }
+}

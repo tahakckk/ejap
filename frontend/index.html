@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JobTracker — Application Management System</title>
+  <meta name="description"
+    content="Track and manage your job applications efficiently. Stay organized throughout your job search journey." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ── AUTH VIEW ── -->
+  <div id="auth-view" class="auth-view">
+    <div class="auth-container">
+      <div class="auth-header">
+        <div class="brand-logo" style="margin: 0 auto 16px;">
+          <svg width="40" height="40" viewBox="0 0 28 28" fill="none">
+            <rect width="28" height="28" rx="8" fill="url(#grad2)" />
+            <path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+            <defs>
+              <linearGradient id="grad2" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366f1" />
+                <stop offset="1" stop-color="#8b5cf6" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1 class="brand-title" style="font-size: 1.8rem;">JobTracker</h1>
+        <p class="auth-subtitle">Welcome back! Please login to your account.</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" placeholder="Enter your username" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div class="form-api-error hidden" id="login-error"></div>
+        <button type="submit" class="btn btn-primary"
+          style="width: 100%; justify-content: center; margin-top: 8px;">Login</button>
+        <p class="auth-switch">Don't have an account? <button type="button" class="btn-link"
+            id="show-register">Register</button></p>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form hidden" novalidate>
+        <div class="form-group">
+          <label for="register-username">Username</label>
+          <input type="text" id="register-username" placeholder="Choose a username" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="register-password">Password</label>
+          <input type="password" id="register-password" placeholder="At least 6 characters"
+            autocomplete="new-password" />
+        </div>
+        <div class="form-api-error hidden" id="register-error"></div>
+        <button type="submit" class="btn btn-primary"
+          style="width: 100%; justify-content: center; margin-top: 8px;">Create Account</button>
+        <p class="auth-switch">Already have an account? <button type="button" class="btn-link"
+            id="show-login">Login</button></p>
+      </form>
+
+      <!-- Admin Login Form  -->
+      <form id="admin-login-form" class="auth-form hidden admin-theme" novalidate>
+        <div class="form-group">
+          <label for="admin-username">Admin ID</label>
+          <input type="text" id="admin-username" placeholder="ROOT ACCESS" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="admin-password">Passphrase</label>
+          <input type="password" id="admin-password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div class="form-api-error hidden" id="admin-error"></div>
+        <button type="submit" class="btn btn-matrix"
+          style="width: 100%; justify-content: center; margin-top: 8px;">Initialize Override</button>
+        <p class="auth-switch" style="color: #4ade80;">System locked. <button type="button" class="btn-link"
+            id="cancel-admin" style="color: #fff;">Return</button></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── APP VIEW ── -->
+  <div id="app-view" class="app-view hidden">
+    <!-- ── HEADER ── -->
+    <header class="header" id="header">
+      <div class="header-inner">
+        <div class="header-brand">
+          <div class="brand-logo">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="8" fill="url(#grad)" />
+              <path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+              <defs>
+                <linearGradient id="grad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#6366f1" />
+                  <stop offset="1" stop-color="#8b5cf6" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div>
+            <h1 class="brand-title">JobTracker</h1>
+            <span class="brand-sub">Application Management System</span>
+          </div>
+          <div class="header-actions">
+            <span class="user-greeting" id="user-greeting"></span>
+            <button class="btn btn-primary" id="btn-add-application">
+              <span class="btn-icon">+</span> New Application
+            </button>
+            <button class="btn btn-ghost" id="btn-logout" title="Logout">
+              Logout
+            </button>
+          </div>
+        </div>
+    </header>
+
+    <!-- ── MAIN ── -->
+    <main class="main" id="main">
+
+      <!-- Stats -->
+      <section class="stats-section" id="stats-section" aria-label="Summary statistics">
+        <div class="stat-card" id="stat-total">
+          <div class="stat-value" id="stat-total-val">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card stat-pending" id="stat-pending">
+          <div class="stat-value" id="stat-pending-val">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card stat-interview" id="stat-interview">
+          <div class="stat-value" id="stat-interview-val">0</div>
+          <div class="stat-label">Interviews</div>
+        </div>
+        <div class="stat-card stat-offer" id="stat-offer">
+          <div class="stat-value" id="stat-offer-val">0</div>
+          <div class="stat-label">Offers</div>
+        </div>
+        <div class="stat-card stat-rejected" id="stat-rejected">
+          <div class="stat-value" id="stat-rejected-val">0</div>
+          <div class="stat-label">Rejected</div>
+        </div>
+      </section>
+
+      <!-- Filters -->
+      <section class="filters-section" id="filters-section" aria-label="Filters">
+        <div class="filter-group">
+          <span class="filter-icon">🔍</span>
+          <input type="text" id="filter-company" placeholder="Search by company name..." class="filter-input"
+            autocomplete="off" />
+        </div>
+        <div class="filter-group filter-select-wrap">
+          <select id="filter-status" class="filter-select">
+            <option value="">All Statuses</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" id="btn-clear-filters" title="Clear all filters">Clear</button>
+      </section>
+
+      <!-- Applications Grid -->
+      <section class="applications-section" id="applications-section" aria-label="Applications">
+        <div id="loading-state" class="loading-state" aria-live="polite">
+          <div class="spinner"></div>
+          <p>Loading applications…</p>
+        </div>
+        <div id="empty-state" class="empty-state hidden" aria-live="polite">
+          <div class="empty-icon">📭</div>
+          <h2>No applications found</h2>
+          <p>Click <strong>New Application</strong> to start tracking your job search.</p>
+        </div>
+        <div id="applications-grid" class="applications-grid" role="list"></div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ── ADD / EDIT MODAL ── -->
+  <div class="modal-overlay hidden" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal" id="application-modal">
+      <div class="modal-header">
+        <h2 id="modal-title">New Application</h2>
+        <button class="modal-close" id="modal-close" aria-label="Close modal">×</button>
+      </div>
+      <form id="application-form" class="modal-body" novalidate>
+        <input type="hidden" id="form-id" />
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-company">Company Name <span class="required">*</span></label>
+            <input type="text" id="form-company" placeholder="e.g. Google, Microsoft…" />
+            <span class="field-error" id="error-company"></span>
+          </div>
+          <div class="form-group">
+            <label for="form-position">Position <span class="required">*</span></label>
+            <input type="text" id="form-position" placeholder="e.g. Software Engineer…" />
+            <span class="field-error" id="error-position"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-status">Status <span class="required">*</span></label>
+            <select id="form-status">
+              <option value="">Select a status…</option>
+            </select>
+            <span class="field-error" id="error-status"></span>
+          </div>
+          <div class="form-group">
+            <label for="form-date">Application Date <span class="required">*</span></label>
+            <input type="date" id="form-date" />
+            <span class="field-error" id="error-date"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-notes">Notes <span class="optional">(optional)</span></label>
+          <textarea id="form-notes" placeholder="Additional notes about this application…" rows="4"></textarea>
+        </div>
+
+        <div class="form-api-error hidden" id="form-api-error"></div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit">Save Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── DELETE CONFIRM MODAL ── -->
+  <div class="modal-overlay hidden" id="delete-overlay" role="dialog" aria-modal="true"
+    aria-labelledby="delete-modal-title">
+    <div class="modal modal-sm" id="delete-modal">
+      <div class="modal-header">
+        <h2 id="delete-modal-title">Delete Application</h2>
+        <button class="modal-close" id="delete-modal-close" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="delete-modal-text">Are you sure you want to delete this application? This action cannot be undone.</p>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="btn-delete-cancel">Cancel</button>
+          <button class="btn btn-danger" id="btn-delete-confirm">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div class="toast hidden" id="toast" role="status" aria-live="polite">
+    <span class="toast-dot"></span>
+    <span id="toast-message"></span>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
